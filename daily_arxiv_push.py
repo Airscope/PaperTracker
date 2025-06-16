@@ -146,5 +146,5 @@ def main(target_date_str=None):
 
 
 if __name__ == "__main__":
-    main("2025-06-13")  # 可指定日期调试
-    # main()  # 默认昨日
+    # main("2025-06-13")  # 可指定日期调试
+    main()  # 默认昨日
