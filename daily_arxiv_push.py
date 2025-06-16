@@ -9,7 +9,7 @@ KEYWORDS = [
 ]
 
 # 顶会关键词列表
-TOP_CONFS = ["ICML", "ACL", "NIPS", "Neurips", "ICLR", "CVPR", "AAAI", "ECCV", "ICCV", "TPAMI"]
+TOP_CONFS = ["ICML", "ACL", "NIPS", "NeurIPS", "ICLR", "CVPR", "ECCV", "ICCV", "TPAMI", "EMNLP", "IEEE Symposium", "USENIX", "SIGIR"]
 
 # 常见中文姓氏
 CHINESE_SURNAMES = [
@@ -22,7 +22,7 @@ CHINESE_SURNAMES = [
     "Hao", "Wu", "An", "Chang", "Le", "Yu", "Shi", "Fu", "Pi", "Bian",
     "Qi", "Kang", "Wu", "Yu", "Yuan", "Bu", "Gu", "Meng", "Ping", "Huang",
     "He", "Mu", "Xiao", "Yin", "Xu", "Du", "Peng", "Shi", "Yun", "Zhong",
-    "Luo", "Yan", "Shang", "Luo", "Huang", "Mu", "Xiao", "Yin", "Xu", "You"
+    "Luo", "Yan", "Shang", "Luo", "Huang", "Mu", "Xiao", "Yin", "Xu", "You", "Hou"
 ]
 
 
