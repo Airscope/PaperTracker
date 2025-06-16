@@ -7,8 +7,10 @@ import os
 KEYWORDS = [
     "LLM", '"large language model"', "agent"
 ]
+
 # 顶会关键词列表
 TOP_CONFS = ["ICML", "ACL", "NIPS", "Neurips", "ICLR", "CVPR", "AAAI", "ECCV", "ICCV", "TPAMI"]
+
 # 常见中文姓氏，用于判断第一作者是否可能为中国人
 CHINESE_SURNAMES = [
     "Zhao", "Qian", "Sun", "Li", "Zhou", "Wu", "Zheng", "Wang", "Feng", "Chen",
@@ -23,11 +25,13 @@ CHINESE_SURNAMES = [
     "Luo", "Yan", "Shang", "Luo", "Huang", "Mu", "Xiao", "Yin", "Xu", "You"
 ]
 
-# 构造 arXiv API 查询
-def fetch_yesterday_llm_papers():
-    today_utc = datetime.now(timezone.utc).date()
-    yesterday_utc = today_utc - timedelta(days=1)
 
+def fetch_llm_papers_by_date(date_utc):
+    """
+    获取指定 UTC 日期的符合关键词的 arXiv 论文
+    :param date_utc: datetime.date 类型
+    :return: List[Dict]
+    """
     query = "+OR+".join(f"all:{kw}" for kw in KEYWORDS)
     url = (
         f"http://export.arxiv.org/api/query?"
@@ -41,7 +45,7 @@ def fetch_yesterday_llm_papers():
     papers = []
     for entry in feed.entries:
         pub_date = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc).date()
-        if pub_date != yesterday_utc:
+        if pub_date != date_utc:
             continue
 
         title = " ".join(entry.title.split())
@@ -64,36 +68,31 @@ def fetch_yesterday_llm_papers():
 
     return papers
 
-# 为每篇论文计算优先级分数
+
 def score_paper(paper):
     score = 0
     c = paper['comment'].lower()
     summary = paper['summary']
-    # accepted 标记
     if 'accept' in c:
         score += 3
-    # 开源代码
     if 'github' in c or 'github' in summary.lower():
         score += 2
-    # 顶会
     for conf in TOP_CONFS:
         if conf.lower() in c:
             score += 2
             break
-    # 第一作者名字非中国姓氏
     parts = paper['first_author'].split()
     surname = parts[-1] if parts else ''
     if surname not in CHINESE_SURNAMES:
         score += 1
     return score
 
-# 构造飞书富文本卡片格式
+
 def build_feishu_card(papers, date_str):
     total = len(papers)
-    # 按分数降序排序，取前10
     ranked = sorted(papers, key=score_paper, reverse=True)[:10]
 
-    header_title = f"📚 昨日 ({date_str}) 共更新 {total} 篇 LLM 论文，优先展示 Top 10"
+    header_title = f"📚 {date_str} 共更新 {total} 篇 LLM 论文，优先展示 Top 10"
     elements = []
     for idx, paper in enumerate(ranked, 1):
         content = (
@@ -117,7 +116,7 @@ def build_feishu_card(papers, date_str):
     }
     return card
 
-# 发送到飞书机器人 Webhook
+
 def send_to_feishu(card_json):
     webhook = os.environ.get("FEISHU_WEBHOOK")
     if not webhook:
@@ -130,11 +129,24 @@ def send_to_feishu(card_json):
         print(f"✅ 推送成功，展示 Top {len(card_json['card']['elements'])} 篇论文")
 
 
-def main():
-    papers = fetch_yesterday_llm_papers()
-    date_str = (datetime.now(timezone.utc).date() - timedelta(days=1)).isoformat()
-    card = build_feishu_card(papers, date_str)
+def main(target_date_str=None):
+    """
+    主函数，支持传入日期字符串（格式 YYYY-MM-DD），默认为昨天
+    """
+    if target_date_str:
+        target_date = datetime.strptime(target_date_str, "%Y-%m-%d").date()
+    else:
+        target_date = datetime.now(timezone.utc).date() - timedelta(days=1)
+
+    papers = fetch_llm_papers_by_date(target_date)
+    if not papers:
+        print(f"⚠️ {target_date} 无匹配论文")
+        return
+
+    card = build_feishu_card(papers, target_date.isoformat())
     send_to_feishu(card)
 
+
 if __name__ == "__main__":
-    main()
+    main("2025-06-14")  # 可指定日期调试
+    # main()  # 默认昨日
