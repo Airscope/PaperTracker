@@ -3,7 +3,7 @@ name: LLM Papers Daily
 on:
   schedule:
     - cron: '30 3 * * *'  # 每天 UTC 1:30 运行（对应亚洲时间约 09:30）
-
+  workflow_dispatch:
 jobs:
   send:
     name: Send LLM arXiv to Feishu
