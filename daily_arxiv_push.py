@@ -15,7 +15,7 @@ def fetch_today_llm_papers():
     query = "+OR+".join(f"all:{kw}" for kw in KEYWORDS)
     url = (
         f"http://export.arxiv.org/api/query?"
-        f"search_query={query}&start=0&max_results=50"
+        f"search_query={query}&start=0&max_results=100"
         f"&sortBy=submittedDate&sortOrder=descending"
     )
 
