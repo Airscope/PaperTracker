@@ -11,7 +11,8 @@ KEYWORDS = [
 
 # 构造 arXiv API 查询
 def fetch_today_llm_papers():
-    today_utc = datetime.now(timezone.utc).date()
+    # today_utc = datetime.now(timezone.utc).date()
+    today_utc = datetime(2025, 6, 13, tzinfo=timezone.utc).date() # 测试
     query = "+OR+".join(f"all:{kw}" for kw in KEYWORDS)
     url = (
         f"http://export.arxiv.org/api/query?"
