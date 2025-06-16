@@ -1,16 +1,26 @@
-name: LLM Papers Daily
+name: Daily Push Arxiv LLM Papers to Feishu
 
 on:
   schedule:
-    - cron: '30 3 * * *'  # 每天 UTC 1:30 运行（对应亚洲时间约 09:30）
-  workflow_dispatch:
+    - cron: '30 1 * * *'  # 每天 UTC 1:30，即北京时间 9:30
+  workflow_dispatch:       # 可手动触发
+
 jobs:
-  send:
-    name: Send LLM arXiv to Feishu
+  push-to-feishu:
     runs-on: ubuntu-latest
     steps:
-      - uses: junka/arxiv_feishu_bot_action@main
-        with:
-          keyword: 'LLM OR "large language model"'  # 设置筛选关键词
-          webhook: ${{ secrets.FEISHU_BOT_WEBHOOK }}
-          signkey: ${{ secrets.FEISHU_BOT_SIGNKEY }}
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: pip install feedparser requests
+
+    - name: Run Arxiv LLM fetcher
+      env:
+        FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+      run: python daily_arxiv_push.py
