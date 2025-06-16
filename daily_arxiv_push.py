@@ -40,7 +40,6 @@ def fetch_today_llm_papers():
             "authors": authors,
             "comment": comment,
             "summary_short": summary_short,
-            "summary_full": summary,
             "link": entry.link
         })
 
@@ -69,10 +68,9 @@ def build_feishu_card(papers):
             f"**标题：** {paper['title']}\n"
             f"**作者：** {paper['authors']}\n"
             f"**备注：** {paper['comment']}\n"
-            f"**摘要预览：**\n"
-            f"```{paper['summary_short']}```\n"
-            f"<collapse>\n```{paper['summary_full']}```\n</collapse>\n"
-            f"[🔗 查看论文]({paper['link']})"
+            f"**摘要：**\n"
+            f"{paper['summary_short']}\n"
+            f"[🔗 查看原文]({paper['link']})"
         )
 
         elements.append({
@@ -112,6 +110,7 @@ def send_to_feishu(card_json):
 
 def main():
     papers = fetch_today_llm_papers()
+    papers = papers[:10] # 最多展示10条推送
     card = build_feishu_card(papers)
     send_to_feishu(card)
 
