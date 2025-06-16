@@ -11,7 +11,7 @@ KEYWORDS = [
 # 顶会关键词列表
 TOP_CONFS = ["ICML", "ACL", "NIPS", "Neurips", "ICLR", "CVPR", "AAAI", "ECCV", "ICCV", "TPAMI"]
 
-# 常见中文姓氏，用于判断第一作者是否可能为中国人
+# 常见中文姓氏
 CHINESE_SURNAMES = [
     "Zhao", "Qian", "Sun", "Li", "Zhou", "Wu", "Zheng", "Wang", "Feng", "Chen",
     "Chu", "Wei", "Jiang", "Shen", "Han", "Yang", "Zhu", "Qin", "You", "Xu",
@@ -27,11 +27,6 @@ CHINESE_SURNAMES = [
 
 
 def fetch_llm_papers_by_date(date_utc):
-    """
-    获取指定 UTC 日期的符合关键词的 arXiv 论文
-    :param date_utc: datetime.date 类型
-    :return: List[Dict]
-    """
     query = "+OR+".join(f"all:{kw}" for kw in KEYWORDS)
     url = (
         f"http://export.arxiv.org/api/query?"
@@ -89,23 +84,30 @@ def score_paper(paper):
 
 
 def build_feishu_card(papers, date_str):
-    total = len(papers)
-    ranked = sorted(papers, key=score_paper, reverse=True)[:10]
-
-    header_title = f"📚 {date_str} 共更新 {total} 篇 LLM 论文，优先展示 Top 10"
-    elements = []
-    for idx, paper in enumerate(ranked, 1):
-        content = (
-            f"**{idx}. 标题：** {paper['title']}\n"
-            f"**作者：** {paper['authors']}\n"
-            f"**备注：** {paper['comment']}\n"
-            f"**摘要：** {paper['summary_short']}\n"
-            f"[🔗 查看原文]({paper['link']})"
-        )
-        elements.append({
+    if not papers:
+        header_title = f"📚 {date_str} 没有匹配的 LLM 论文更新"
+        elements = [{
             "tag": "div",
-            "text": {"tag": "lark_md", "content": content}
-        })
+            "text": {"tag": "lark_md", "content": "今日没有论文可展示。"}
+        }]
+    else:
+        total = len(papers)
+        ranked = sorted(papers, key=score_paper, reverse=True)[:10]
+
+        header_title = f"📚 {date_str} 共更新 {total} 篇 LLM 论文，优先展示 Top 10"
+        elements = []
+        for idx, paper in enumerate(ranked, 1):
+            content = (
+                f"**{idx}. 标题：** {paper['title']}\n"
+                f"**作者：** {paper['authors']}\n"
+                f"**备注：** {paper['comment']}\n"
+                f"**摘要：** {paper['summary_short']}\n"
+                f"[🔗 查看原文]({paper['link']})"
+            )
+            elements.append({
+                "tag": "div",
+                "text": {"tag": "lark_md", "content": content}
+            })
 
     card = {
         "msg_type": "interactive",
@@ -126,7 +128,7 @@ def send_to_feishu(card_json):
     if resp.status_code != 200:
         print("❌ 飞书推送失败:", resp.status_code, resp.text)
     else:
-        print(f"✅ 推送成功，展示 Top {len(card_json['card']['elements'])} 篇论文")
+        print(f"✅ 飞书推送成功：{card_json['card']['header']['title']['content']}")
 
 
 def main(target_date_str=None):
@@ -139,14 +141,10 @@ def main(target_date_str=None):
         target_date = datetime.now(timezone.utc).date() - timedelta(days=1)
 
     papers = fetch_llm_papers_by_date(target_date)
-    if not papers:
-        print(f"⚠️ {target_date} 无匹配论文")
-        return
-
     card = build_feishu_card(papers, target_date.isoformat())
     send_to_feishu(card)
 
 
 if __name__ == "__main__":
-    main("2025-06-14")  # 可指定日期调试
+    main("2025-06-13")  # 可指定日期调试
     # main()  # 默认昨日
