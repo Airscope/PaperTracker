@@ -54,7 +54,7 @@ def build_feishu_card(papers):
                 "header": {
                     "title": {
                         "tag": "plain_text",
-                        "content": f"📭 今日（{datetime.now().strftime('%Y-%m-%d')}）无最新 LLM 论文"
+                        "content": f"📭 Arxiv 今日（{datetime.now().strftime('%Y-%m-%d')}）无最新 LLM 论文"
                     }
                 },
                 "elements": []
