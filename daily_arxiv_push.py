@@ -10,8 +10,8 @@ KEYWORDS = [
 
 # 构造 arXiv API 查询
 def fetch_today_llm_papers():
-    # today_utc = datetime.now(timezone.utc).date()
-    today_utc = datetime(2025, 6, 13, tzinfo=timezone.utc).date() # 测试
+    today_utc = datetime.now(timezone.utc).date()
+    # today_utc = datetime(2025, 6, 13, tzinfo=timezone.utc).date() # 测试
     query = "+OR+".join(f"all:{kw}" for kw in KEYWORDS)
     url = (
         f"http://export.arxiv.org/api/query?"
@@ -86,7 +86,7 @@ def build_feishu_card(papers):
             "header": {
                 "title": {
                     "tag": "plain_text",
-                    "content": f"📚 今日 LLM / GPT 最新论文（共 {len(papers)} 篇）"
+                    "content": f"📚 Arxiv 今日 LLM 最新论文（共 {len(papers)} 篇）"
                 }
             },
             "elements": elements
