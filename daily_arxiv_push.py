@@ -5,8 +5,7 @@ import os
 
 # 配置关键词组合
 KEYWORDS = [
-    "LLM", "GPT", '"large language model"', '"agent"',
-    "chatgpt", "prompt", "fine-tune", "pretrain"
+    "LLM", '"large language model"', "agent"
 ]
 
 # 构造 arXiv API 查询
