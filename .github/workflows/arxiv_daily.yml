@@ -2,7 +2,7 @@ name: LLM Papers Daily
 
 on:
   schedule:
-    - cron: '12 3 * * *'  # 每天 UTC 1:30 运行（对应亚洲时间约 09:30）
+    - cron: '15 3 * * *'  # 每天 UTC 1:30 运行（对应亚洲时间约 09:30）
 
 jobs:
   send:
@@ -12,5 +12,5 @@ jobs:
       - uses: junka/arxiv_feishu_bot_action@main
         with:
           keyword: 'LLM OR "large language model"'  # 设置筛选关键词
-          webhook: https://open.feishu.cn/open-apis/bot/v2/hook/a9178161-7e93-4a59-b397-836558c72ca8
-          # signkey: ${{ secrets.FEISHU_BOT_SIGNKEY }}  # 如使用签名校验
+          webhook: ${{ secrets.FEISHU_BOT_WEBHOOK }}
+          signkey: ${{ secrets.FEISHU_BOT_SIGNKEY }}
