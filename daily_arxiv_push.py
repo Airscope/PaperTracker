@@ -5,7 +5,7 @@ import os
 
 # 配置关键词组合
 KEYWORDS = [
-    "LLM", '"large language model"', "agent"
+    "LLM", '"large language model"'
 ]
 
 # 顶会关键词列表
