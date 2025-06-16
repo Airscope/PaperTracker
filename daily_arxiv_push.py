@@ -109,7 +109,6 @@ def send_to_feishu(card_json):
 
 def main():
     papers = fetch_today_llm_papers()
-    papers = papers[:10] # 最多展示10条推送
     card = build_feishu_card(papers)
     send_to_feishu(card)
 
